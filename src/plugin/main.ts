@@ -42,7 +42,7 @@ interface ColorSettings{
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DEFAULT_SETTINGS: ColorSettings = {
-	snippets_file: "snippets : It is an obsidian plugin, that replaces your selected text.",
+	snippets_file: "",
 	snippets : [""],
 	colors : new Map(),
 }
