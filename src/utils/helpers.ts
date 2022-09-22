@@ -29,7 +29,7 @@ export function createNewColorSettings(container : HTMLElement , plugin : AutoCo
 			text
 			.setPlaceholder("red or #00ff00 or 00ff00 ...")
 			.onChange(async (value) => {
-				plugin.settings.snippets_file = value;
+				plugin.settings.colors = value;
 				await plugin.saveSettings();
                 return container;
 			})

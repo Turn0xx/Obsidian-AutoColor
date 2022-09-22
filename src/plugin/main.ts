@@ -3,9 +3,6 @@
 import {Hotkey, MarkdownView , Plugin, Setting , PluginSettingTab, App } from 'obsidian';
 import { createColorCommand} from 'src/utils/helpers';
 
-
-
-
 export default class AutoColorPlugin extends Plugin {
 
 	settings: ColorSettings;
@@ -34,17 +31,13 @@ export default class AutoColorPlugin extends Plugin {
 	}
 }
 interface ColorSettings{
-	snippets_file: string;
-	snippets: string[];
-	colors:  Map<string , string>;
+	colors:  string,
 }
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DEFAULT_SETTINGS: ColorSettings = {
-	snippets_file: "",
-	snippets : [""],
-	colors : new Map(),
+	colors : ""
 }
 
 
@@ -74,18 +67,18 @@ class ColorSettingsTab extends PluginSettingTab {
 		.setClass("text-colors-input")
 		.addTextArea((text) => {
 			text.setPlaceholder("red;green;#ff0000;#00ff00");
-			if (this.plugin.settings.snippets_file !== "") {
-				text.setValue(this.plugin.settings.snippets_file);
+			if (this.plugin.settings.colors !== "") {
+				text.setValue(this.plugin.settings.colors);
 			}
 			text.onChange(async (value) => {
-				this.plugin.settings.snippets_file = value;
+				this.plugin.settings.colors = value;
 				await this.plugin.saveSettings();
 			})
 		});
 
 
 		this.plugin.loadSettings().then(() => {
-			const colors = this.plugin.settings.snippets_file.split(";");
+			const colors = this.plugin.settings.colors.split(";");
 			colors.forEach((color) => {
 				createColorCommand(color, 'auto-color:'+color , 'auto '+color , this.plugin); 
 			});
