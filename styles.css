@@ -1,8 +1,21 @@
-/*
+ 
+/* .text-colors-input > * > textarea{
+width:40em;
+height: 100%;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.text-colors-input > div > div {
+}
 
-If your plugin does not need CSS, delete this file.
+.text-colors-input > * {
+height: 100%;
+width: 60em;
+}
 
-*/
+.text-colors-input {
+height: 70%;
+} */
+.setting-item > .text-colors-input > *:first-child {
+    margin-right: 16px;
+    margin-top: -260px;
+}
