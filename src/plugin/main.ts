@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {Hotkey, MarkdownView , Plugin, Setting , PluginSettingTab, App } from 'obsidian';
-import { createColorCommand} from 'src/utils/helpers';
+import { createColorCommand, loadShortcuts} from 'src/utils/helpers';
 
 export default class AutoColorPlugin extends Plugin {
 
@@ -11,15 +11,16 @@ export default class AutoColorPlugin extends Plugin {
 		console.log(this.manifest.name+" v" + this.manifest.version + " loaded - Author : " + this.manifest.author);
 		await this.loadSettings();
 		this.addSettingTab(new ColorSettingsTab(this.app, this));
-		createColorCommand('chartreuse', 'auto-color:red' , 'auto red' ,  this , [{modifiers: ['Mod', 'Shift'], key: 'R'}]);
-		createColorCommand('chocolate', 'auto-color:green' , 'auto green' ,  this ,  [{modifiers: ['Mod', 'Shift'], key: 'G'}] );
-
+		// createColorCommand('chartreuse', 'auto-color:red' , 'auto red' ,  this , [{modifiers: ['Mod', 'Shift'], key: 'R'}]);
+		// createColorCommand('chocolate', 'auto-color:green' , 'auto green' ,  this ,  [{modifiers: ['Mod', 'Shift'], key: 'G'}] );
+		loadShortcuts(this);
 		await this.saveSettings();
 		await this.saveData(this.settings);
 	}
 
-	onunload(): void {
-		
+	async onunload() {
+		this.settings.registeredColors = [];
+		await this.saveSettings(); 
 	}
 
 	async loadSettings() {
@@ -32,12 +33,14 @@ export default class AutoColorPlugin extends Plugin {
 }
 interface ColorSettings{
 	colors:  string,
+	registeredColors: string[],
 }
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DEFAULT_SETTINGS: ColorSettings = {
-	colors : ""
+	colors : "",
+	registeredColors : [],
 }
 
 
@@ -63,7 +66,7 @@ class ColorSettingsTab extends PluginSettingTab {
 		
 		new Setting(containerEl)
 		.setName("Colors")
-		.setDesc("Type here your colors separated by a comma")
+		.setDesc("Type here your colors separated by a comma, after you finish press '!'; it is not going to show on the screen but it is going to refresh the colors table right now otherwise you have to go out of setting and reentre it" )
 		.setClass("text-colors-input")
 		.addTextArea((text) => {
 			text.setPlaceholder("red;green;#ff0000;#00ff00");
@@ -71,6 +74,11 @@ class ColorSettingsTab extends PluginSettingTab {
 				text.setValue(this.plugin.settings.colors);
 			}
 			text.onChange(async (value) => {
+				if (value.at(-1) === '!') {
+					value = value.slice(0, -1);
+					text.setValue(value);
+					loadShortcuts(this.plugin);
+				}
 				this.plugin.settings.colors = value;
 				await this.plugin.saveSettings();
 			})
@@ -78,9 +86,12 @@ class ColorSettingsTab extends PluginSettingTab {
 
 
 		this.plugin.loadSettings().then(() => {
-			const colors = this.plugin.settings.colors.split(";");
-			colors.forEach((color) => {
-				createColorCommand(color, 'auto-color:'+color , 'auto '+color , this.plugin); 
+			const colors = this.plugin.settings.colors.split(";").slice(0, -1);
+			colors.forEach((color , index) => {
+				console.log(index);
+				if (!this.plugin.settings.registeredColors.contains(color)) {
+					createColorCommand(color, 'auto-color:'+color , 'auto '+color , this.plugin); 
+				}
 			});
 		});
 	}

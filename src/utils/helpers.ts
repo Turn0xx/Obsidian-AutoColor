@@ -16,8 +16,9 @@ export function createColorCommand(color : string ,id : string , name : string ,
             changeColor(color , plugin);
         },
     });
-
     console.log(color , id , name , shortcut);
+    plugin.settings.registeredColors.push(color);
+    plugin.saveSettings();
 }
 
 export function createNewColorSettings(container : HTMLElement , plugin : AutoColorPlugin): any {
@@ -71,4 +72,15 @@ export function verifyColor(color: string): string | undefined {
         if (regex.test(color))
             return "#"+color;
     }
+}
+
+export function loadShortcuts(plugin : AutoColorPlugin , value ?: string): void {
+    plugin.loadSettings().then(() => {
+        const colors = plugin.settings.colors.split(";");
+        colors.forEach((color) => {
+            if (!plugin.settings.registeredColors.contains(color)) {
+                createColorCommand(color, 'auto-color:'+color , 'auto '+color , plugin); 
+            }
+        });
+    });
 }
