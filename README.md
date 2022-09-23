@@ -20,3 +20,8 @@ A plugin to change color of text with some shortcuts
 - Go to the plugin shortcuts then you will find all valid colors with no shortcuts
 - Add shortcuts
 - Notice : Hex colors are not working for now
+
+<img width="357" alt="image" src="https://user-images.githubusercontent.com/51353325/191852118-ebc7ae51-6969-46f8-91fd-f8838fa7a092.png">
+<img width="356" alt="image" src="https://user-images.githubusercontent.com/51353325/191852536-b9439fa8-2032-4d94-897a-188c8ce3e940.png">
+
+
