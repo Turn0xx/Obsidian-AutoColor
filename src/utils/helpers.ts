@@ -30,11 +30,11 @@ export function getWorldFromFont(font : string){
 
 export function verifyColor(color: string): string | undefined {
     if (colorKeyWords.includes(color)) return color;
-    let regex = new RegExp('^#[a-f0-9]{6}');
+    let regex = new RegExp("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
     if (regex.test(color)) 
         return color;
     else{
-        regex = new RegExp('/^[a-f0-9]{3}');
+        regex = new RegExp('([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$');
         if (regex.test(color))
             return "#"+color;
     }
