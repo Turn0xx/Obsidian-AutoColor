@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {Hotkey, MarkdownView , Plugin, Setting , PluginSettingTab, App } from 'obsidian';
-import { checkRegisteredCommands, createColorCommand, loadShortcuts} from 'src/utils/helpers';
+import { checkRegisteredCommands, createColorCommand, loadShortcuts} from 'src/utils/pluginFunctions';
 
 export default class AutoColorPlugin extends Plugin {
 
@@ -11,8 +11,7 @@ export default class AutoColorPlugin extends Plugin {
 		console.log(this.manifest.name+" v" + this.manifest.version + " loaded - Author : " + this.manifest.author);
 		await this.loadSettings();
 		this.addSettingTab(new ColorSettingsTab(this.app, this));
-		// createColorCommand('chartreuse', 'auto-color:red' , 'auto red' ,  this , [{modifiers: ['Mod', 'Shift'], key: 'R'}]);
-		// createColorCommand('chocolate', 'auto-color:green' , 'auto green' ,  this ,  [{modifiers: ['Mod', 'Shift'], key: 'G'}] );
+		createColorCommand('unColor', 'auto-color: Uncolor' , 'Uncolor' ,  this , [{modifiers: ['Mod', 'Shift'], key: '*'}] , true);
 		await loadShortcuts(this);
 		await this.saveSettings();
 		await this.saveData(this.settings);
@@ -33,6 +32,7 @@ export default class AutoColorPlugin extends Plugin {
 }
 interface ColorSettings{
 	colors:  string,
+	preSet: string,
 	registeredColors: string[],
 }
 
@@ -40,6 +40,7 @@ interface ColorSettings{
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DEFAULT_SETTINGS: ColorSettings = {
 	colors : "",
+	preSet : "unColor",
 	registeredColors : [],
 }
 
@@ -89,8 +90,7 @@ class ColorSettingsTab extends PluginSettingTab {
 
 		this.plugin.loadSettings().then(() => {
 			const colors = this.plugin.settings.colors.split(";").slice(0, -1);
-			colors.forEach((color , index) => {
-				console.log("Processing Color : " + color);
+			colors.forEach((color) => {
 				if (!this.plugin.settings.registeredColors.contains(color)) {
 					console.log("Creating Color : " + color);
 					createColorCommand(color, 'auto-color:'+color , 'auto '+color , this.plugin); 
