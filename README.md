@@ -19,6 +19,4 @@ A plugin to change color of text with some shortcuts
 - Add your colors separated with `;` to the text area then press `!` to load them
 - Go to the plugin shortcuts then you will find all valid colors with no shortcuts
 - Add shortcuts
-- Notice : Hex colors are not working for now
-
--Uncolor colored word : `Alt` + `Shift` + `H`
+- Uncolor colored word : `Alt` + `Shift` + `H`
