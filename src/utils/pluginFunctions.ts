@@ -89,7 +89,7 @@ export function unColor(plugin : AutoColorPlugin): void {
             return;
         } 
         const currentLine : string = editor.getLine(cursor.line);
-        const fontRegex : RegExp = new RegExp('<font style="color:([a-zA-Z]|([a-zA-Z]+( [a-zA-Z]+)+))+">[a-zA-Z]+</font>');
+        const fontRegex : RegExp = new RegExp('<font style="color:.*">.*</font>');
         const match : RegExpMatchArray | null = findSequenceFromCursor(currentLine , fontRegex , cursor , 5);
         if (!match) return;
         const coloredWord = getWorldFromFont(match[0]);
