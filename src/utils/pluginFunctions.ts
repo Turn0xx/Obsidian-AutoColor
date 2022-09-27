@@ -66,9 +66,8 @@ export function changeColor(color : string , plugin : AutoColorPlugin): void {
         const token = editor.getSelection();
         if (token){
             const newToken = `<font style="color:${color}">${token}</font>`;
-            const newTokenLength = newToken.length + 1;
-            editor.replaceSelection(newToken + ' ');
-            cursor.ch = cursor.ch + newTokenLength;
+            editor.replaceSelection(newToken + ' ');//TODO : remove the space and make it work by cursor
+            cursor.ch = cursor.ch + newToken.length;
         }
     }
 }

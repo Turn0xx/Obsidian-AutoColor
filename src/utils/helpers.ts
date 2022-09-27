@@ -9,9 +9,11 @@ export function findSequenceFromCursor(line : string , regex : RegExp , cursor: 
     while (!findRegex && stop < 1000){
         stop++;
         const substrLine = line.substring(searchOffset , cursor.ch);
+        console.log(substrLine);
         const match = regex.test(substrLine);
         if (match){
             findRegex = true;
+            console.table(regex.exec(substrLine));
             return regex.exec(substrLine);
         }
         if (searchOffset - step < 0 && searchOffset !== 0) searchOffset = 0;
@@ -24,7 +26,7 @@ export function findSequenceFromCursor(line : string , regex : RegExp , cursor: 
 }
 
 export function getWorldFromFont(font : string){
-    const wordRegex : RegExp = new RegExp('>[a-zA-Z]+<')
+    const wordRegex : RegExp = new RegExp('>(.*)<');
     return font.match(wordRegex);
 }
 
