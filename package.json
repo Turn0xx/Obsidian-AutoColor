@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"deploy": "robocopy . C:\\Users\\elhil\\OneDrive\\Documents\\Personal\\WebDev-Map\\WebDev\\.obsidian\\plugins\\mypersonalplugin styles.css main.js manifest.json",
+		"deploy": "robocopy . C:\\Users\\elhil\\OneDrive\\Documents\\Université\\Etude\\.obsidian\\plugins\\mypersonalplugin styles.css main.js manifest.json",
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
 		"bpush": "npm run build && npm run deploy"
 	},

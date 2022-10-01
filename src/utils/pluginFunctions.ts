@@ -125,10 +125,9 @@ export async function checkRegisteredCommands(plugin : AutoColorPlugin): Promise
 export async function loadShortcuts(plugin : AutoColorPlugin , value ?: string): Promise<void> {
     await plugin.loadSettings().then(() => {
         const colors = plugin.settings.colors.split(";");
+        console.log(colors);
         colors.forEach((color) => {
-            if (!plugin.settings.registeredColors.contains(color)) {
-                createColorCommand(color, 'auto-color:'+color , 'auto '+color , plugin); 
-            }
+            createColorCommand(color, 'auto-color:'+color , 'auto '+color , plugin); 
         });
     });
 }
