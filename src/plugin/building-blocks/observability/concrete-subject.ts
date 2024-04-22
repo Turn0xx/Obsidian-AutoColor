@@ -1,5 +1,5 @@
 import { Observer } from "./observer";
-import { Subject } from "./subject";
+import { ActionMap, ObservableAction, Subject } from "./subject";
 
 export class BasicSubject implements Subject {
   private observers: Observer[] = [];
@@ -13,11 +13,16 @@ export class BasicSubject implements Subject {
   }
 
   public notifyAdd(colorName: string) {
-    this.observers.map((o) => o.update('add' , colorName));
+    this.observers.map((o) => o.update('add' , {colorName}));
   }
 
+
   public notifyRemove(colorName: string) {
-    this.observers.map((o) => o.update('remove' , colorName));
+    this.observers.map((o) => o.update('remove' , {colorName}));
+  }
+
+  public notify<T extends ObservableAction>(payload: ActionMap[T]): void {
+    throw new Error("Method not implemented.");
   }
 
   detach(observer: Observer): void {

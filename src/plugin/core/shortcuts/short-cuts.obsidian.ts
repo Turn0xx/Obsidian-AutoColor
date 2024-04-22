@@ -5,6 +5,7 @@ import { ObsidianColorManager } from "../color-managing/color-manager.obsidian";
 import { Observer } from "src/plugin/building-blocks/observability/observer";
 import { Colorizer } from "../colorizer.obsidian";
 import { ShortCuts } from "./short-cuts";
+import { ActionMap, ObservableAction } from "src/plugin/building-blocks/observability/subject";
 
 export class ObsidianShortCuts implements ShortCuts , Observer {
 	private static commands: Command[] = [];
@@ -20,9 +21,9 @@ export class ObsidianShortCuts implements ShortCuts , Observer {
 
 	private constructor(private plugin: Plugin) {}
 
-	update(actionType: ActionType, colorName: string): void {
-		if (actionType === "add") {
-			this.addCommand(colorName);
+	update<T extends ObservableAction>(actionType: T, payload: ActionMap[T]): void {
+		if (actionType === 'add' && 'colorName' in payload){
+			this.addCommand(payload.colorName);
 		} else if (actionType === "remove") {
 			this.removeCommand();
 		}
@@ -39,7 +40,6 @@ export class ObsidianShortCuts implements ShortCuts , Observer {
 				id: `color-${colorName}`,
 				name: `Color ${colorName}`,
 				checkCallback: (checking: boolean) => {
-					console.log(ObsidianShortCuts.commands);
 					if (
 						ObsidianShortCuts.commands.find((c) => c.id.endsWith(colorName))
 					) {

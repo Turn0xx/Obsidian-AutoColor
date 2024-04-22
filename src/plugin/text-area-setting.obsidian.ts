@@ -1,11 +1,42 @@
 import { Setting, TextAreaComponent } from "obsidian";
 import { ColorManager } from "./core/color-managing/color-manager";
 import { Color } from "./core/color.value-object";
-export class TextAreaSetting {
+import {
+	ActionMap,
+	ObservableAction,
+	Subject,
+} from "./building-blocks/observability/subject";
+import { Observer } from "./building-blocks/observability/observer";
+export class TextAreaSetting implements Subject {
 	private lastValidValue: string = "";
 	private textAreaRef: TextAreaComponent;
+	private observers: Observer[] = [];
 
 	constructor(private colorManager: ColorManager) {}
+
+	notify<T extends ObservableAction>(payload: ActionMap[T]): void {
+		this.observers.map((observer) => {
+			if ('colors' in payload) {
+				observer.update("updated", { colors: payload.colors });
+			} 
+		});
+	}
+	attach(observer: Observer): void {
+		if (this.observers.includes(observer)) {
+			return;
+		}
+
+		this.observers.push(observer);
+	}
+	detach(observer: Observer): void {
+		this.observers = this.observers.filter((obs) => obs !== observer);
+	}
+	notifyAdd(colorName: string): void {
+		throw new Error("Method not implemented.");
+	}
+	notifyRemove(colorName: string): void {
+		throw new Error("Method not implemented.");
+	}
 
 	public async configure(
 		TextComponent: TextAreaComponent,
@@ -19,7 +50,6 @@ export class TextAreaSetting {
 			TextComponent.setValue(this.colorsToTextArea(settings));
 			this.lastValidValue = this.colorsToTextArea(settings);
 		});
-
 		TextComponent.onChange(async () => {
 			const trimmedValue = TextComponent.getValue().trim();
 			if (trimmedValue === this.lastValidValue) {
@@ -33,11 +63,18 @@ export class TextAreaSetting {
 			}
 			this.success(displaySetting);
 			this.removeDoublon(trimmedValue);
-			this.saveColors(trimmedValue);
+			await this.saveColors(trimmedValue);
 		});
 	}
 
-	private saveColors(newColors: string) {
+	public addToTextArea(color: string) {
+		const currentColors = this.textAreaRef.getValue();
+		this.textAreaRef.inputEl.innerHTML = currentColors + ";" + color;
+		this.textAreaRef.setValue(currentColors + ";" + color);
+		this.textAreaRef.inputEl.dispatchEvent(new Event("input"));
+	}
+
+	private async saveColors(newColors: string) {
 		const lastColors = this.lastValidValue.split(";");
 		const changes = newColors.split(";");
 
@@ -55,6 +92,8 @@ export class TextAreaSetting {
 			if (color === "") return;
 			this.colorManager.removeColor(Color.from(color));
 		});
+
+		this.notify<'updated'>({ colors: await this.colorManager.loadColors() });
 
 		this.lastValidValue = newColors;
 	}
