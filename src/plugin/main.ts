@@ -1,21 +1,16 @@
-/* eslint-disable prefer-const */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {
-	Hotkey,
-	MarkdownView,
-	Plugin,
-	Setting,
-	PluginSettingTab,
-	App,
-} from "obsidian";
+import { Plugin, Setting, PluginSettingTab, App } from "obsidian";
 import { ColorManager } from "./core/color-managing/color-manager";
 import { TextAreaSetting } from "./text-area-setting";
 import { ObsidianColorManager } from "./core/color-managing/color-manager.obsidian";
+import { ObsidianShortCuts } from "./core/shortcuts/short-cuts.obsidian";
+import { ShortCuts } from "./core/shortcuts/short-cuts";
+import { Observer } from "./building-blocks/observability/observer";
+import { Subject } from "./building-blocks/observability/subject";
+import { Colorizer } from "./core/colorizer.obsidian";
 
 export default class AutoColorPlugin extends Plugin {
-	settings: ColorSettings;
-
 	private colorManager: ColorManager = ObsidianColorManager.getInstance(this);
+	private shortCutsManager: ShortCuts = ObsidianShortCuts.getInstance(this);
 
 	async onload() {
 		console.log(
@@ -25,35 +20,20 @@ export default class AutoColorPlugin extends Plugin {
 				" loaded - Author : " +
 				this.manifest.author
 		);
+		(this.shortCutsManager as ObsidianShortCuts).addEssentialCommands();
+		(this.colorManager as ObsidianColorManager as Subject).attach(
+			this.shortCutsManager as ObsidianShortCuts as Observer
+		);
 		this.colorManager.loadSettings();
+		Colorizer.attachPlugin(this);
 
 		this.addSettingTab(new ColorSettingsTab(this.app, this));
-		// createColorCommand('unColor', 'auto-color: Uncolor' , 'Uncolor' ,  this , [{modifiers: ['Mod', 'Shift'], key: '*'}] , true);
-		// await loadShortcuts(this);
-		// await this.saveSettings();
-		// await this.saveData(this.settings);
+
 	}
 
 	async onunload() {
 		await this.colorManager.saveSettings();
 	}
-
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			[],
-			await this.loadData()
-		);
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-interface ColorSettings {
-	colors: string;
-	preSet: string;
-	registeredColors: string[];
 }
 
 class ColorSettingsTab extends PluginSettingTab {
@@ -65,20 +45,13 @@ class ColorSettingsTab extends PluginSettingTab {
 		super(app, plugin);
 		this.plugin = plugin;
 		this.textAreaSetting = new TextAreaSetting(
-			ObsidianColorManager.getInstance(plugin)
+			ObsidianColorManager.getInstance()
 		);
 	}
 
 	public display(): void {
-		let { containerEl } = this;
-		containerEl.empty();
-		containerEl.createEl("h1", { text: "Auto Color Plugin" });
-		containerEl.createEl("span", { text: " Created By " }).createEl("a", {
-			text: "Mouad 👩🏽‍💻",
-			href: "https://github.com/Trun0xx",
-		});
-		containerEl.createEl("h2", { text: "Customize your colors : " });
-		const displaySetting = new Setting(containerEl);
+		this.prepareContainer();
+		const displaySetting = new Setting(this.containerEl);
 
 		displaySetting
 			.setName("Colors")
@@ -87,37 +60,19 @@ class ColorSettingsTab extends PluginSettingTab {
 			)
 			.setClass("text-colors-input")
 			.addTextArea((textArea) => {
-				this.textAreaSetting.configure(textArea , displaySetting);
-
-				// text.setPlaceholder("red;green;#ff0000;#00ff00");
-				// if (this.plugin.settings.colors !== "") {
-				// 	text.setValue(this.plugin.settings.colors);
-				// }
-				// text.onChange(async (value) => {
-				// 	console.log("Value : " + value);
-				// 	if (value.at(-1) === '!') {
-				// 		this.plugin.loadSettings();
-				// 		value = value.slice(0, -1);
-				// 		text.setValue(value);
-				// 		await loadShortcuts(this.plugin);
-				// 		await checkRegisteredCommands(this.plugin);
-				// 	}
-				// 	this.plugin.settings.colors = value;
-				// 	await this.plugin.saveSettings();
-				// })
+				this.textAreaSetting.configure(textArea, displaySetting);
 			});
+	}
 
-		// console.log("Colors : " + this.plugin.settings.colors);
+	public prepareContainer(): void {
+		let { containerEl } = this;
 
-		// this.plugin.loadSettings().then(() => {
-		// 	const colors = this.plugin.settings.colors.split(";").slice(0, -1);
-		// 	colors.forEach((color) => {
-		// 		console.log("Color : " + color);
-		// 		if (!this.plugin.settings.registeredColors.contains(color)) {
-		// 			console.log("Creating Color : " + color);
-		// 			createColorCommand(color, 'auto-color:'+color , 'auto '+color , this.plugin);
-		// 		}
-		// 	});
-		// });
+		containerEl.empty();
+		containerEl.createEl("h1", { text: "Auto Color Plugin" });
+		containerEl.createEl("span", { text: " Created By " }).createEl("a", {
+			text: "Mouad 👩🏽‍💻",
+			href: "https://github.com/Trun0xx",
+		});
+		containerEl.createEl("h2", { text: "Customize your colors : " });
 	}
 }

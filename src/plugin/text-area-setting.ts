@@ -1,6 +1,6 @@
 import { Setting, TextAreaComponent } from "obsidian";
 import { ColorManager } from "./core/color-managing/color-manager";
-import { Color } from "./core/color-managing/color.value-object";
+import { Color } from "./core/color.value-object";
 export class TextAreaSetting {
 	private lastValidValue: string = "";
 	private textAreaRef: TextAreaComponent;
@@ -43,6 +43,9 @@ export class TextAreaSetting {
 
 		const added = changes.filter((color) => !lastColors.includes(color));
 		const removed = lastColors.filter((color) => !changes.includes(color));
+
+		console.log("Added : ", added);
+		console.log("Removed : ", removed);
 
 		added.map((color) => {
 			if (color === "") return;

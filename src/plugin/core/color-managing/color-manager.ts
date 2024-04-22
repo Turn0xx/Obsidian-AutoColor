@@ -1,4 +1,6 @@
-import { Color } from "./color.value-object";
+import { Subject } from "src/plugin/building-blocks/observability/subject";
+import { Color } from "../color.value-object";
+import { Observer } from "src/plugin/building-blocks/observability/observer";
 
 export interface ColorManager {
   addColor(color: Color): void;

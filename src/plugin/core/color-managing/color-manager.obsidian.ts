@@ -1,16 +1,22 @@
 import { Plugin } from "obsidian";
 import { ColorManager } from "./color-manager";
-import { Color } from "./color.value-object";
+import { Color } from "../color.value-object";
+import { Subject } from "src/plugin/building-blocks/observability/subject";
+import { Observer } from "src/plugin/building-blocks/observability/observer";
+import { BasicSubject } from "src/plugin/building-blocks/observability/concrete-subject";
 
 type RawData = {
 	_color: string;
 };
 
-export class ObsidianColorManager implements ColorManager {
+export class ObsidianColorManager extends BasicSubject implements ColorManager {
 	private static instance: ObsidianColorManager;
 
-	public static getInstance(plugin: Plugin): ObsidianColorManager {
+	public static getInstance(plugin?: Plugin): ObsidianColorManager {
 		if (!ObsidianColorManager.instance) {
+			if (!plugin) {
+				throw new Error("No plugin attached to the color manager instance");
+			}
 			ObsidianColorManager.instance = new ObsidianColorManager(plugin);
 		}
 		return ObsidianColorManager.instance;
@@ -18,7 +24,10 @@ export class ObsidianColorManager implements ColorManager {
 
 	private colors: Color[] = [];
 
-	private constructor(private plugin: Plugin) {}
+	private constructor(private plugin: Plugin) {
+		super();
+	}
+
 
 	async loadColors(): Promise<Color[]> {
 		await this.loadSettings();
@@ -27,21 +36,24 @@ export class ObsidianColorManager implements ColorManager {
 	}
 
 	public addColor(color: Color): void {
+		console.log("Adding color", color);
 		if (this.colors.find((c) => c.equals(color))) {
 			return;
 		}
 		this.colors.push(color);
 
 		this.saveSettings()
-			.then(() => console.log(`Color ${color.unpack()} added`))
 			.catch((e) => console.error(e));
+
+		this.notifyAdd(color.unpack());
 	}
 	public removeColor(color: Color): void {
 		this.colors = this.colors.filter((c) => !c.equals(color));
 
 		this.saveSettings()
-			.then(() => console.log(`Color ${color.unpack()} removed`))
 			.catch((e) => console.error(e));
+
+		this.notifyRemove(color.unpack());
 	}
 
 	public async saveSettings(): Promise<void> {
@@ -53,6 +65,9 @@ export class ObsidianColorManager implements ColorManager {
 
 		if (!rawData) return;
 
-		this.colors = rawData.map((data) => Color.from(data._color));
+		this.colors = rawData.map((data) => {
+			this.notifyAdd(data._color);
+			return Color.from(data._color)
+		});
 	}
 }
