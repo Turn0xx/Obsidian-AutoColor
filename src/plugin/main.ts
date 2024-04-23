@@ -7,7 +7,7 @@ import { ShortCuts } from "./core/shortcuts/short-cuts";
 import { Observer } from "./building-blocks/observability/observer";
 import { Subject } from "./building-blocks/observability/subject";
 import { Colorizer } from "./core/colorizer.obsidian";
-import { ColorSettingsTab } from "./settings-tab.obsidian";
+import { ColorSettingsTab } from "./settings-tab.obsidian"; 
 
 export default class AutoColorPlugin extends Plugin {
 	private colorManager: ColorManager = ObsidianColorManager.getInstance(this);
@@ -29,9 +29,11 @@ export default class AutoColorPlugin extends Plugin {
 		Colorizer.attachPlugin(this);
 
 		this.addSettingTab(new ColorSettingsTab(this.app, this));
+
 	}
 
 	async onunload() {
 		await this.colorManager.saveSettings();
 	}
 }
+

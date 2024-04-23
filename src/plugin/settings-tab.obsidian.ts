@@ -68,7 +68,7 @@ export class ColorSettingsTab extends PluginSettingTab {
     
 
 
-    colorsPreviewer.render(previewColorSetting);
+    colorsPreviewer.render(previewColorSetting , this.textAreaSetting);
 
 
     /*colors.map((color) => {

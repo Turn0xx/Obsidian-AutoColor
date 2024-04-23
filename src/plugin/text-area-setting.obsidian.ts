@@ -74,6 +74,14 @@ export class TextAreaSetting implements Subject {
 		this.textAreaRef.inputEl.dispatchEvent(new Event("input"));
 	}
 
+	public changeColor(color: string, index: number) {
+		console.log("Changing color at index ", index);
+		const currentColors = this.textAreaRef.getValue().split(";");
+		currentColors[index] = color;
+		this.textAreaRef.setValue(currentColors.join(";"));
+		this.textAreaRef.inputEl.dispatchEvent(new Event("input"));
+	}
+
 	private async saveColors(newColors: string) {
 		const lastColors = this.lastValidValue.split(";");
 		const changes = newColors.split(";");
