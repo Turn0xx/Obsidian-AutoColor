@@ -1,10 +1,10 @@
 import { Setting, TextAreaComponent } from "obsidian";
-import { Observer } from "./building-blocks/observability/observer";
+import { Observer } from "../building-blocks/observability/observer";
 import {
 	ObservableAction,
 	ActionMap,
-} from "./building-blocks/observability/subject";
-import { Color } from "./core/color.value-object";
+} from "../building-blocks/observability/subject";
+import { Color } from "../core/color.value-object";
 import { ColorTranslator } from "colortranslator";
 import { TextAreaSetting } from "./text-area-setting.obsidian";
 

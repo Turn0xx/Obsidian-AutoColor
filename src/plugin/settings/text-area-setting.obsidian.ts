@@ -1,12 +1,12 @@
 import { Setting, TextAreaComponent } from "obsidian";
-import { ColorManager } from "./core/color-managing/color-manager";
-import { Color } from "./core/color.value-object";
+import { ColorManager } from "../core/color-managing/color-manager";
+import { Color } from "../core/color.value-object";
 import {
 	ActionMap,
 	ObservableAction,
 	Subject,
-} from "./building-blocks/observability/subject";
-import { Observer } from "./building-blocks/observability/observer";
+} from "../building-blocks/observability/subject";
+import { Observer } from "../building-blocks/observability/observer";
 export class TextAreaSetting implements Subject {
 	private lastValidValue: string = "";
 	private textAreaRef: TextAreaComponent;

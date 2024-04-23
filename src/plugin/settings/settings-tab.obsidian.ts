@@ -1,8 +1,8 @@
 import { PluginSettingTab, App, Setting } from "obsidian";
-import { ObsidianColorManager } from "./core/color-managing/color-manager.obsidian";
-import AutoColorPlugin from "./main";
+import { ObsidianColorManager } from "../core/color-managing/color-manager.obsidian";
+import AutoColorPlugin from "../main";
 import { TextAreaSetting } from "./text-area-setting.obsidian";
-import { ColorManager } from "./core/color-managing/color-manager";
+import { ColorManager } from "../core/color-managing/color-manager";
 import { ColorTranslator } from "colortranslator";
 import { ColorPreview } from "./color-previewer.obsidian";
 
