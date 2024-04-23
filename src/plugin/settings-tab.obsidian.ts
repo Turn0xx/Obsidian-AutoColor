@@ -43,19 +43,19 @@ export class ColorSettingsTab extends PluginSettingTab {
     
     const addColorSetting = new Setting(this.containerEl);
 
-    let Color = ''
+    let colorToBeAdded = ''
 
     addColorSetting
       .setName("Add Color")
       .setDesc("Add a new color")
       .addColorPicker((colorPicker) => {
         colorPicker.onChange((color) => {
-          Color = color;
+          colorToBeAdded = color;
         });
       })
       .addButton((button) => {
         button.setButtonText("Add Color").onClick((call) => {
-          this.textAreaSetting.addToTextArea(Color);
+          this.textAreaSetting.addToTextArea(colorToBeAdded);
         });
       });
 
