@@ -12,6 +12,10 @@ export class ColorSettingsTab extends PluginSettingTab {
 	plugin: AutoColorPlugin;
 	private colorManager: ColorManager;
 
+	private colorSettings: Setting;
+	private addColorSettings: Setting;
+	private previewColorSettings: Setting;
+
 	constructor(app: App, plugin: AutoColorPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
@@ -23,28 +27,64 @@ export class ColorSettingsTab extends PluginSettingTab {
 		const colorsPreviewer: ColorPreview = ColorPreview.fromColors(
 			await this.colorManager.loadColors()
 		);
+
 		this.textAreaSetting.attach(colorsPreviewer);
 
-		this.prepareTextAreaContainer();
-		const colorSetting = new Setting(this.containerEl);
+		this.prepareColorSectionSettings();
+		this.displayColorSettings();
 
-		colorSetting
+		this.prepareAddColorButton();
+		this.displayAddColorSettings();
+
+		this.preparePreviewColors();
+		this.displayPreviewColorSettings(colorsPreviewer);
+	}
+
+	public prepareColorSectionSettings(): void {
+		let { containerEl } = this;
+
+		containerEl.empty();
+		containerEl.createEl("h1", { text: "Auto Color Plugin" });
+		containerEl.createEl("span", { text: " Created By " }).createEl("a", {
+			text: "Mouad 👩🏽‍💻",
+			href: "https://github.com/Trun0xx",
+		});
+		containerEl.createEl("h2", { text: "Customize your colors : " });
+	}
+
+	public displayColorSettings(): void {
+		let { containerEl } = this;
+
+		this.colorSettings = new Setting(containerEl);
+
+		this.colorSettings
 			.setName("Colors")
 			.setDesc(
 				"Type here your colors separated by a ';'. If the color is valid, it will be displayed in the preview section. and you can change it by clicking on it."
 			)
 			.setClass("text-colors-input")
 			.addTextArea(async (textArea) => {
-				await this.textAreaSetting.configure(textArea, colorSetting);
+				await this.textAreaSetting.configure(
+					textArea,
+					this.colorSettings
+				);
 			});
+	}
 
-		this.prepareAddColorButton();
+	public prepareAddColorButton(): void {
+		let { containerEl } = this;
 
-		const addColorSetting = new Setting(this.containerEl);
+		containerEl.createEl("h2", { text: "Color Adding" });
+	}
+
+	public displayAddColorSettings(): void {
+		let { containerEl } = this;
+
+		this.addColorSettings = new Setting(containerEl);
 
 		let colorToBeAdded = "";
 
-		addColorSetting
+		this.addColorSettings
 			.setName("Add Color")
 			.setDesc("Add a new color")
 			.addColorPicker((colorPicker) => {
@@ -57,39 +97,24 @@ export class ColorSettingsTab extends PluginSettingTab {
 					this.textAreaSetting.addToTextArea(colorToBeAdded);
 				});
 			});
-
-		const previewColorSetting = new Setting(this.containerEl);
-
-		previewColorSetting
-			.setName("Preview Colors")
-			.setDesc("Preview your colors")
-			.setTooltip("This is a tooltip");
-
-		colorsPreviewer.render(previewColorSetting, this.textAreaSetting);
-
-	}
-
-	public prepareTextAreaContainer(): void {
-		let { containerEl } = this;
-
-		containerEl.empty();
-		containerEl.createEl("h1", { text: "Auto Color Plugin" });
-		containerEl.createEl("span", { text: " Created By " }).createEl("a", {
-			text: "Mouad 👩🏽‍💻",
-			href: "https://github.com/Trun0xx",
-		});
-		containerEl.createEl("h2", { text: "Customize your colors : " });
-	}
-
-	public prepareAddColorButton(): void {
-		let { containerEl } = this;
-
-		containerEl.createEl("h2", { text: "Color Adding" });
 	}
 
 	public preparePreviewColors(): void {
 		let { containerEl } = this;
 
 		containerEl.createEl("h2", { text: "Preview Colors" });
+	}
+
+	public displayPreviewColorSettings(renderer: ColorPreview): void {
+		let { containerEl } = this;
+
+		this.previewColorSettings = new Setting(containerEl);
+
+		this.previewColorSettings
+			.setName("Preview Colors")
+			.setDesc("Preview your colors")
+			.setTooltip("This is a tooltip");
+
+		renderer.render(this.previewColorSettings, this.textAreaSetting);
 	}
 }
