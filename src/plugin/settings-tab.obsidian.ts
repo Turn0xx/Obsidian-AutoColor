@@ -20,82 +20,53 @@ export class ColorSettingsTab extends PluginSettingTab {
 	}
 
 	public async display(): Promise<void> {
+		const colorsPreviewer: ColorPreview = ColorPreview.fromColors(
+			await this.colorManager.loadColors()
+		);
+		this.textAreaSetting.attach(colorsPreviewer);
+
 		this.prepareTextAreaContainer();
-		const displaySetting = new Setting(this.containerEl);
+		const colorSetting = new Setting(this.containerEl);
 
-    const colorsPreviewer = ColorPreview.fromColors(await this.colorManager.loadColors());
-    this.textAreaSetting.attach(colorsPreviewer);
-
-		displaySetting
+		colorSetting
 			.setName("Colors")
 			.setDesc(
-				"Type here your colors separated by a comma, after you finish press '!'; it is not going to show on the screen but it is going to refresh the colors table right now otherwise you have to go out of setting and reentre it"
+				"Type here your colors separated by a ';'. If the color is valid, it will be displayed in the preview section. and you can change it by clicking on it."
 			)
 			.setClass("text-colors-input")
 			.addTextArea(async (textArea) => {
-				await this.textAreaSetting.configure(textArea, displaySetting);
+				await this.textAreaSetting.configure(textArea, colorSetting);
 			});
 
-    
+		this.prepareAddColorButton();
 
-    this.prepareAddColorButton();
+		const addColorSetting = new Setting(this.containerEl);
 
-    
-    const addColorSetting = new Setting(this.containerEl);
+		let colorToBeAdded = "";
 
-    let colorToBeAdded = ''
+		addColorSetting
+			.setName("Add Color")
+			.setDesc("Add a new color")
+			.addColorPicker((colorPicker) => {
+				colorPicker.onChange((color) => {
+					colorToBeAdded = color;
+				});
+			})
+			.addButton((button) => {
+				button.setButtonText("Add Color").onClick((call) => {
+					this.textAreaSetting.addToTextArea(colorToBeAdded);
+				});
+			});
 
-    addColorSetting
-      .setName("Add Color")
-      .setDesc("Add a new color")
-      .addColorPicker((colorPicker) => {
-        colorPicker.onChange((color) => {
-          colorToBeAdded = color;
-        });
-      })
-      .addButton((button) => {
-        button.setButtonText("Add Color").onClick((call) => {
-          this.textAreaSetting.addToTextArea(colorToBeAdded);
-        });
-      });
+		const previewColorSetting = new Setting(this.containerEl);
 
-    const previewColorSetting = new Setting(this.containerEl);
+		previewColorSetting
+			.setName("Preview Colors")
+			.setDesc("Preview your colors")
+			.setTooltip("This is a tooltip");
 
-    previewColorSetting
-      .setName("Preview Colors")
-      .setDesc("Preview your colors")
-      .setTooltip("This is a tooltip")
-    
+		colorsPreviewer.render(previewColorSetting, this.textAreaSetting);
 
-
-    colorsPreviewer.render(previewColorSetting , this.textAreaSetting);
-
-
-    /*colors.map((color) => {
-      displaySetting
-        .addColorPicker((colorPicker) => {
-          colorPicker
-            .setValue(color.unpack())
-            .onChange((value) => {
-              console.log("Color changed" + value);
-            });
-        })
-        .addButton((button) => {
-          button.setButtonText("Remove").onClick(() => {
-            this.colorManager.removeColor(color);
-          });
-        });
-    });
-
-		/*.addColorPicker((colorPicker) => {
-        displaySetting.setName("Color Picker")
-        .setDesc("Pick a color")
-        .addButton((button) => {
-          button.setButtonText("Change color").onClick(() => {
-            console.log("Color changed");
-          });
-        });
-      })*/
 	}
 
 	public prepareTextAreaContainer(): void {
@@ -110,15 +81,15 @@ export class ColorSettingsTab extends PluginSettingTab {
 		containerEl.createEl("h2", { text: "Customize your colors : " });
 	}
 
-  public prepareAddColorButton(): void {
-    let { containerEl } = this;
+	public prepareAddColorButton(): void {
+		let { containerEl } = this;
 
-    containerEl.createEl("h2", { text: "Color Adding" });
-  }
+		containerEl.createEl("h2", { text: "Color Adding" });
+	}
 
-  public preparePreviewColors(): void {
-    let { containerEl } = this;
+	public preparePreviewColors(): void {
+		let { containerEl } = this;
 
-    containerEl.createEl("h2", { text: "Preview Colors" });
-  }
+		containerEl.createEl("h2", { text: "Preview Colors" });
+	}
 }
