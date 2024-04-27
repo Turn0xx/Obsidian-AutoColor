@@ -22,8 +22,6 @@ export class ShortCutsModal extends Modal {
 			.then((colors) => {
 				this.colorMap = this.mapColorsToShortcuts(colors);
 			});
-
-		// this.colorMap = this.mapColorsToShortcuts(colors);
 	}
 
 	private mapColorsToShortcuts(colors: Color[]) {
@@ -65,11 +63,6 @@ export class ShortCutsModal extends Modal {
 			}
 		});
 	};
-
-	// public render() {
-	// 	const { contentEl = this. }
-	//
-	// }
 
 	async onOpen() {
 		const { contentEl } = this;

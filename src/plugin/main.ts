@@ -45,8 +45,6 @@ export default class AutoColorPlugin extends Plugin {
 				const pointer: number[] = [0];
 
 				const delayer: ModelDelayer = ModelDelayer.from(this.app);
-
-				// new ShortCutsModal(this.app).open();
 			},
 			hotkeys: [],
 		});
