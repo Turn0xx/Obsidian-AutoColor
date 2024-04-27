@@ -1,101 +1,58 @@
-/* eslint-disable prefer-const */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {Hotkey, MarkdownView , Plugin, Setting , PluginSettingTab, App } from 'obsidian';
-import { checkRegisteredCommands, createColorCommand, loadShortcuts} from 'src/utils/pluginFunctions';
+import { Plugin, App, Command } from "obsidian";
+import { ColorManager } from "./core/color-managing/color-manager";
+import { ObsidianColorManager } from "./core/color-managing/color-manager.obsidian";
+import { ObsidianShortCuts } from "./core/shortcuts/short-cuts.obsidian";
+import { ShortCuts } from "./core/shortcuts/short-cuts";
+import { Observer } from "./building-blocks/observability/observer";
+import { Subject } from "./building-blocks/observability/subject";
+import { Colorizer } from "./core/colorizer.obsidian";
+import { ColorSettingsTab } from "./settings/settings-tab.obsidian";
+import { ShortCutsModal } from "./modals/short-cuts-modal.obsidian";
+import ModelDelayer from "./modals/modal-delayer";
+export type ExtentedApp = App & {
+	commands: {
+		executeCommandById: (id: string) => void;
+		findCommand(commandId: string): Command;
+		listCommands(): Command[];
+	};
+};
 
 export default class AutoColorPlugin extends Plugin {
-
-	settings: ColorSettings;
+	private colorManager: ColorManager = ObsidianColorManager.getInstance(this);
+	private shortCutsManager: ShortCuts = ObsidianShortCuts.getInstance(this);
 
 	async onload() {
-		console.log(this.manifest.name+" v" + this.manifest.version + " loaded - Author : " + this.manifest.author);
-		await this.loadSettings();
+		console.log(
+			this.manifest.name +
+				" v" +
+				this.manifest.version +
+				" loaded - Author : " +
+				this.manifest.author,
+		);
+		(this.shortCutsManager as ObsidianShortCuts).addEssentialCommands();
+		(this.colorManager as ObsidianColorManager as Subject).attach(
+			this.shortCutsManager as ObsidianShortCuts as Observer,
+		);
+		this.colorManager.loadSettings();
+		Colorizer.attachPlugin(this);
+
 		this.addSettingTab(new ColorSettingsTab(this.app, this));
-		createColorCommand('unColor', 'auto-color: Uncolor' , 'Uncolor' ,  this , [{modifiers: ['Mod', 'Shift'], key: '*'}] , true);
-		await loadShortcuts(this);
-		await this.saveSettings();
-		await this.saveData(this.settings);
+
+		this.addCommand({
+			id: "open-color-picker",
+			name: "Open Color Picker",
+			callback: () => {
+				const pointer: number[] = [0];
+
+				const delayer: ModelDelayer = ModelDelayer.from(this.app);
+			},
+			hotkeys: [],
+		});
 	}
 
 	async onunload() {
-		this.settings.registeredColors = [];
-		await this.saveSettings(); 
+		await this.colorManager.saveSettings();
 	}
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings)
-	}
-}
-interface ColorSettings{
-	colors:  string,
-	preSet: string,
-	registeredColors: string[],
-}
-
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const DEFAULT_SETTINGS: ColorSettings = {
-	colors : "",
-	preSet : "unColor",
-	registeredColors : [],
-}
-
-
-class ColorSettingsTab extends PluginSettingTab {
-	plugin: AutoColorPlugin;
-
-	constructor(app: App, plugin: AutoColorPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		let {
-			containerEl
-		} = this;
-		containerEl.empty();
-		containerEl.createEl('h1', {text: 'Auto Color Plugin'});
-		containerEl.createEl("span" , {text : " Created By "}).createEl("a", {
-			text: "Mouad 👩🏽‍💻",
-			href: "https://github.com/Trun0xx",
-		});
-		containerEl.createEl("h2" , {text : "Customize your colors : "});
-		
-		new Setting(containerEl)
-		.setName("Colors")
-		.setDesc("Type here your colors separated by a comma, after you finish press '!'; it is not going to show on the screen but it is going to refresh the colors table right now otherwise you have to go out of setting and reentre it" )
-		.setClass("text-colors-input")
-		.addTextArea((text) => {
-			text.setPlaceholder("red;green;#ff0000;#00ff00");
-			if (this.plugin.settings.colors !== "") {
-				text.setValue(this.plugin.settings.colors);
-			}
-			text.onChange(async (value) => {
-				if (value.at(-1) === '!') {
-					this.plugin.loadSettings();
-					value = value.slice(0, -1);
-					text.setValue(value);
-					await loadShortcuts(this.plugin);
-					await checkRegisteredCommands(this.plugin);
-				}
-				this.plugin.settings.colors = value;
-				await this.plugin.saveSettings();
-			})
-		});
-
-
-		this.plugin.loadSettings().then(() => {
-			const colors = this.plugin.settings.colors.split(";").slice(0, -1);
-			colors.forEach((color) => {
-				if (!this.plugin.settings.registeredColors.contains(color)) {
-					console.log("Creating Color : " + color);
-					createColorCommand(color, 'auto-color:'+color , 'auto '+color , this.plugin); 
-				}
-			});
-		});
-	}
+	//write a random function :
 }

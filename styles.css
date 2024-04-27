@@ -19,3 +19,7 @@ height: 70%;
     margin-right: 16px;
     margin-top: -260px;
 }
+
+.setting-item > .text-colors-input-error {
+    background-color: red;
+}
