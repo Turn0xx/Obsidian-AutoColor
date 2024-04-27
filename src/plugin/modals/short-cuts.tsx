@@ -5,14 +5,14 @@ import { Color } from "../core/color.value-object";
 
 type ShortCutsComponentProps = {
 	handleKeyDown: (event: KeyboardEvent) => void;
-	colors: Color[];
+	colors: any[];
 };
 
 const ShortCutsComponent = ({
 	handleKeyDown,
 	colors,
 }: ShortCutsComponentProps) => {
-	document.addEventListener("keydown", handleKeyDown);
+	// document.addEventListener("keydown", handleKeyDown);
 
 	return (
 		<div>
